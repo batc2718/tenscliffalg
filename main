@@ -1,0 +1,95 @@
+import sympy as sp
+from sympy import symbols , diff , sin , cos
+from math import e
+
+from os import system
+system('cls')
+
+#from sympy.diffgeom import Manifold
+from sympy.tensor.tensor import tensor_indices
+
+
+class manifold:
+    def __init__(self,sym,dim=3):
+        self.name=symbols(sym)
+        self.dim=dim
+
+        self.indexes={}
+        self.coords={}
+        self.basis={}
+        self.cobasis={}
+
+        self.chart={}
+        self.metric={}
+
+
+class coordsys:
+    def __init__(self,syms,mfld,indexes=[1,2,3,4,5,6,7,8,9]):
+        self.mfld=mfld
+        self.sym=syms
+        indexes=[indexes[a] for a in range(mfld.dim)]
+        coordidx=[]
+        basisself=[]
+        cobasisself=[]
+        for a in range(mfld.dim):
+            coordidx.append(symbols(f"{syms}^{indexes[a]}",commutative=False))
+            basisself.append(symbols(f"{syms}_{indexes[a]}",commutative=False))
+            cobasisself.append(symbols(f"d{syms}^{indexes[a]}",commutative=False))
+        mfld.indexes.update({syms:{"syms":indexes,"dummy":""}})
+        mfld.coords.update({syms:coordidx})
+        mfld.basis.update({syms:basisself})
+        mfld.cobasis.update({syms:cobasisself})
+    def __str__(self):
+        return self.sym
+    def __hash__(self):
+        return hash(self.sym)
+    def __eq__(self, other):
+        if isinstance(other,coordsys):
+            return self.sym==other.sym
+        return self.sym==other
+    def dummy(self,syms):
+        #symlist=syms.split()
+        #mfld=self.mfld
+        #if mfld.indexes[self]!=None:
+        #    mfld.indexes[self]['dummy']=symlist
+        return (1,2,3)
+
+class dummy:
+    pass
+
+class chart:
+    def __init__(self,mfld,coordsys,func,domain=None):
+        xi=mfld.coords[coordsys]
+        if func=='kronecker':
+            func=[[xi[a] if a==b else 0 for a in range(mfld.dim)] for b in range(mfld.dim)]
+        metric=[[diff(func[a][b],xi[b]) for a in range(mfld.dim)] for b in range(mfld.dim)]
+        mfld.chart.update({coordsys:func})
+        mfld.metric.update({coordsys:metric})
+
+
+class vector:
+    def __init__(self,sym,mfld):
+        self.sym=symbols(sym)
+        self.name=sym
+        self.mfld=mfld
+    
+    def comp(self,coordsys):
+        temp=self.name
+        temp2=self.mfld
+        indexes=temp2.indexes[coordsys]
+
+
+M=manifold('M')
+x=coordsys('x',M)
+
+print(M.coords)
+xu1,xu2,xu3=M.coords[x]
+x1,x2,x3=M.basis[x]
+dx1,dx2,dx3=M.cobasis[x]
+
+chart(M,x,'kronecker')
+
+i,j,k=x.dummy('i j k')
+print(M.indexes)
+print(M.coords)
+print(x)
