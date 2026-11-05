@@ -1,0 +1,22 @@
+#region Setup
+from os import system
+system('cls')
+
+from types import SimpleNamespace
+from sympy import symbols
+
+#endregion
+
+pntname=["CG","a","b","c"]
+coordsym=["x1","x2","x3"]
+
+class testclass:
+    def __init__(self,sym,t1,t2):
+        self=SimpleNamespace()
+        for n in range(len(t1)):
+            setattr(self,t1[n],symbols(f"{sym}_{t1[n]}"))
+
+
+F=testclass('F',pntname,coordsym)
+
+print(F.a)
