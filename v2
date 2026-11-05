@@ -1,0 +1,107 @@
+#Delete
+from os import system
+system('cls')
+
+#region
+from sympy import symbols
+from types import SimpleNamespace
+
+#endregion
+
+#region Tenscliffalg
+#class Manifold():
+#    def __init__(self,sym:str,dim:int=3,font:str='mathscr'):
+#        self.sym=sym
+#        self.font=font
+#        self.dim=dim
+#
+#    def __str__(self):
+#        return f"\{self.font}{{{self.sym}}}"
+
+
+class CarCoordsys:
+    def __init__(self,sym,dim=3,indexes=[1,2,3],includesym=True,vecsym='e'):
+        self.sym=sym
+        self.dim=dim
+        self.vecindexes=[f"{indexes[n]}" for n in range(dim)]
+        if includesym==True:# For [x1,x2,x3]
+            self.indexes=[f"{sym}{indexes[n]}" for n in range(dim)]
+            self.basis=symbols([f"{sym}_{indexes[n]}" for n in range(dim)],commutative=False)
+        if includesym==False:# For [x,y,z]
+            self.indexes=[f"{indexes[n]}" for n in range(dim)]
+            self.basis=symbols([f"{vecsym}_{indexes[n]}" for n in range(dim)],commutative=False)
+        
+    def __str__(self):
+        return self.sym
+    def __hash__(self):
+        return hash(self.sym)
+
+class vec:
+    def __init__(self,name,cannonsys):
+        self.name=name
+        self.cannonsys=cannonsys
+        for n in range(cannonsys.dim):
+            temp=veccomp(f"{name}^{cannonsys.vecindexes[n]}")
+            setattr(self,cannonsys.indexes[n],temp)  
+    def __str__(self):
+        return self.name
+    def __call__(self,coordsys):
+        pass
+    def addsys(self,coordsys,relation):
+        pass
+
+class veccomp:
+    def __init__(self,name):
+        self.name=name
+        self.sym=symbols(name)
+        self.eqn=None
+    def __str__(self):
+        return self.name
+    def __getattr__(cls):
+        return cls.sym
+
+#endregion
+
+class points:
+    def __init__(self,coordsys,components,sym):
+        self.names=sym.split(" ")
+        self.coordsys=coordsys
+        self.comps=components
+
+class displacement:
+    def __init__(self,pnt:points):
+        self.points=pnt
+    def __truediv__(self,other):
+        pass
+
+class Force:
+    def __init__(self,sym,pnt:points):
+        self.sym=sym
+        for n in range(len(pnt.comps)):
+            temp=vec(f"{sym}_{pnt.names[n]}",pnt.coordsys)
+            setattr(self,pnt.names[n],temp)
+
+class Reaction:
+    pass
+
+class Component:
+    pass
+
+
+CG=[2,0,0]
+a=[1,3,2]
+b=[3,5,1]
+c=[1,3,2]
+
+x=CarCoordsys('x')
+x1,x2,x3=x.basis
+pnt=points(x,[CG,a,b,c],"CG a b c")
+r=displacement(pnt)
+
+F=Force('F',pnt)
+
+print(F.b.x3.eqn)
+print(type(F.CG.x1))
+F.b.x3.eqn=F.CG.x1*1
+print(F.b.x3.eqn)
+print(F.b.x3)
